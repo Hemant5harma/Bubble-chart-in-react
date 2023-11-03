@@ -24,8 +24,8 @@ const App = () => {
   useEffect(() => {
     if (data.length === 0) return;
    // Specify the dimensions of the chart.
-  const width = 928;
-  const height = width;
+  const width = 1080;
+  const height = 600;
   const margin = 1; // to avoid clipping the root circle stroke
   const name = d => d.id; // "Strings" of "flare.util.Strings"
   const names = d => {
@@ -78,9 +78,11 @@ const App = () => {
   
   // Add a filled circle.
   node.append("circle")
-    .attr("fill-opacity", 0.7)
-    .attr("fill", d => d.data.price_change_percentage_24h < 0 ? color("negative") : color("positive"))
-    .attr("r", d => scaleBubble(Math.abs(d.data.price_change_percentage_24h)));
+  .attr("fill-opacity", 0.55)
+  .attr("stroke", d => d.data.price_change_percentage_24h < 0 ? "#fa0505" : "#2efa05") // Add a black stroke to the circles
+  .attr("stroke-width", 1.6) // Set the stroke width to 2
+  .attr("fill", d => d.data.price_change_percentage_24h < 0 ? color("negative") : color("positive"))
+  .attr("r", d => scaleBubble(Math.abs(d.data.price_change_percentage_24h)));
   
   // Add a label.
   const text = node.append("text")
@@ -104,7 +106,7 @@ const App = () => {
     .attr("fill-opacity", 0.7)
     .text(d => format(Math.abs(d.data.price_change_percentage_24h/100)));
   
-  // return Object.assign(svg.node(), { scales: { color } });
+  
   }, [data]);
 
 
