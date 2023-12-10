@@ -5,7 +5,7 @@ import axios from "axios"
 
 const App = () => {
   
-   const coins =  "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=gecko_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h"
+   const coins =  "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=gecko_desc&per_page=200&page=1&sparkline=false&price_change_percentage=24h"
    const [data, setPosts] = useState([]);
    
    useEffect(() => {
@@ -98,7 +98,28 @@ const App = () => {
     .attr("x", 0)
     .attr("y", (d, i, nodes) => `${i - nodes.length / 2 + 0.35}em`)
     .text(d => d);
-  
+
+
+    // add image inside the bubble
+   node.append("image")
+   .attr("xlink:href", d => d.data.image) // Provide the URL or path to the image in your data
+   .attr("x", d =>  scaleBubble(Math.abs(d.data.price_change_percentage_24h)) <= 20 ? -8 : -20)
+   .attr("y", d =>  -scaleBubble(Math.abs(d.data.price_change_percentage_24h))/2)
+   //.attr("y", d =>  scaleBubble(Math.abs(d.data.price_change_percentage_24h)) <= 20 ? -8 : -20)
+   .attr("width", d => scaleBubble(Math.abs(d.data.price_change_percentage_24h)))
+   .attr("height", d => scaleBubble(Math.abs(d.data.price_change_percentage_24h)))
+
+
+  // simulation
+    const simulation = d3.forceSimulation(root.leaves())
+    .force("charge", d3.forceManyBody().strength(1))
+    .force("collide", d3.forceCollide().radius(d => scaleBubble(Math.abs(d.data.price_change_percentage_24h)) + 1).iterations(10))
+    .force("x", d3.forceX(width / 2).strength(0.05))
+    .force("y", d3.forceY(height / 2).strength(0.26))
+    .on("tick", () => {
+      node.attr("transform", d => `translate(${Math.max(scaleBubble(Math.abs(d.data.price_change_percentage_24h)), Math.min(width - scaleBubble(Math.abs(d.data.price_change_percentage_24h)), d.x))},${Math.max(scaleBubble(Math.abs(d.data.price_change_percentage_24h)), Math.min(height - scaleBubble(Math.abs(d.data.price_change_percentage_24h)), d.y))})`);
+    });
+
   // Add a tspan for the node’s value.
   text.append("tspan")
     .attr("x", 0)
